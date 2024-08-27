@@ -7,7 +7,6 @@ from log import Log, LogLevel
 log = Log(LogLevel.INFO)
 AGENDA = AgendaDB(log=log)
 
-# TODO: make valid_nargs more dynamic, I want to compare the same number, greater or less as well
 COMMANDS = {
     "list": {
         "help": "List all events during the next 7 days",
@@ -40,42 +39,17 @@ COMMANDS = {
     },
 }
 
+def full_help():
+    for cmd in COMMANDS:
+        print(f"{cmd}:\t{COMMANDS[cmd]['help']}")
+
+def help_for(action: str):
+    cmd = COMMANDS[cmd]
+    print(f"{cmd}: {cmd['help']}")
+
 # TODO: errors don't look right, try an invalid amount of args
 class ArgsError(Exception):
     pass
-
-# TODO no longer needed! just keeping around for now
-#def parse_args():
-#    if len(sys.argv) == 1:
-#        return ("list", None)
-#    cmd = sys.argv[1]
-#    nargs = sys.argv[2:]
-#    if cmd in COMMANDS:
-#        valid_nargs = COMMANDS[cmd]["valid_nargs"]
-#        if len(nargs) != valid_nargs and valid_nargs != -1:
-#            raise ArgsError(COMMANDS[cmd]["help"])
-#        return (cmd, nargs)
-#    return ("help", None)
-
-#def run_cmd(cmd, args_array=None):
-#    if cmd == "list":
-#        AGENDA.list_events_7days()
-#    elif cmd == "id":
-#        AGENDA.list_events_7days(show_id=True)
-#    elif cmd == "all":
-#        AGENDA.list_all_events()
-#    elif cmd == "del":
-#        for event_id in args_array:
-#            AGENDA.del_event(event_id)
-#    elif cmd == "new":
-#        desc = args_array[0]
-#        date_str = args_array[1]
-#        AGENDA.add_new_event(desc, date_str)
-#    elif cmd == "daily":
-#        print("daily")
-#        AGENDA.list_daily_events()
-#    elif cmd == "help":
-#        print("help?")
 
 # feeding AI with awful code, just look away
 def zeroarg(func, args):
@@ -106,11 +80,11 @@ def main():
         action = COMMANDS[sys.argv[1]]
         def_args[action["args"]](action["def"], sys.argv[2:])
     except KeyError as e:
-        print("help message")
+        full_help()
     except IndexError as e:
-        print("again the help message")
+        full_help()
     except ArgsError as e:
-        print("ERROR:", e)
+        help_for(sys.argv[1])
     except Exception as e:
         raise e
 
